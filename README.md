@@ -59,12 +59,26 @@ fmt.Println(partList.Parts[0].Name)
 Search for parts via a search term. The second argument is the region to search with.
 
 ```go
-parts, err := scraper.SearchParts("ryzen 5", "uk")
-if err != nil {
-    log.Fatal(err)
-}
+parts, err := scraper.SearchParts("ryzen 5 3600", "uk")
 
-fmt.Println(parts[0].Name)
+// Some searches redirect to a product page, if you know that what you are searching will not redirect
+// then you do not need to do the type assertion and if statement.
+_, ok := err.(*gopartpicker.RedirectError)
+
+if ok {
+    // RedirectError.Error returns the URL of the redirect
+    part, err := scraper.GetPart(err.Error())
+
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    fmt.Println(part.Name)
+} else if err != nil {
+    log.Fatal(err)
+} else {
+    fmt.Println(parts[0].Name)
+}
 ```
 
 Set headers for subsequent requests.
