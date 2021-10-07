@@ -326,7 +326,7 @@ func (s Scraper) GetPart(URL string) (*Part, error) {
 			Name:    vendor.ChildAttr(".td__logo a img", "alt"),
 			Image:   "https:" + vendor.ChildAttr(".td__logo a img", "src"),
 			InStock: vendor.ChildText(".td__availability") == "In stock",
-			URL:     vendor.ChildAttr(".td__finalPrice", "href"),
+			URL:     "https://" + vendor.Request.URL.Host + vendor.ChildAttr(".td__finalPrice a", "href"),
 			Price:   price,
 		})
 	})
