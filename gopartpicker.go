@@ -33,6 +33,14 @@ type Scraper struct {
 	Collector *colly.Collector
 }
 
+type RedirectError struct {
+	URL string
+}
+
+func (r RedirectError) Error() string {
+	return r.URL
+}
+
 // Extracts the name of a vendor from a PCPartPicker affiliate link
 func ExtractVendorName(URL string) string {
 	return strings.Split(URL, "/")[2]
@@ -182,6 +190,12 @@ func (s Scraper) SearchParts(searchTerm string, region string) ([]SearchPart, er
 
 	searchResults := []SearchPart{}
 
+	var reqURL string
+
+	s.Collector.OnHTML(".pageTitle", func(h *colly.HTMLElement) {
+		reqURL = h.Request.URL.String()
+	})
+
 	s.Collector.OnHTML(".search-results__pageContent .block", func(el *colly.HTMLElement) {
 		el.ForEach(".list-unstyled li", func(i int, searchResult *colly.HTMLElement) {
 			vendorURL := searchResult.ChildAttr(".search_results--price a", "href")
@@ -219,6 +233,12 @@ func (s Scraper) SearchParts(searchTerm string, region string) ([]SearchPart, er
 
 	if err != nil {
 		return nil, err
+	}
+
+	if MatchProductURL(reqURL) {
+		return nil, &RedirectError{
+			URL: reqURL,
+		}
 	}
 
 	return searchResults, nil
