@@ -49,6 +49,8 @@ func ExtractVendorName(URL string) string {
 // Creates a new Scraper instance.
 func NewScraper() Scraper {
 	col := colly.NewCollector()
+	col.Async = true
+	col.AllowURLRevisit = true
 
 	s := Scraper{
 		Collector: col,
