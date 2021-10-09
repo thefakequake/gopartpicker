@@ -170,6 +170,7 @@ func (s Scraper) GetPartList(URL string) (*PartList, error) {
 		}
 	})
 	err := s.Collector.Visit(URL)
+	s.Collector.Wait()
 
 	if err != nil {
 		return nil, err
@@ -232,6 +233,7 @@ func (s Scraper) SearchParts(searchTerm string, region string) ([]SearchPart, er
 	})
 
 	err := s.Collector.Visit(fullURL)
+	s.Collector.Wait()
 
 	if err != nil {
 		return nil, err
@@ -353,6 +355,8 @@ func (s Scraper) GetPart(URL string) (*Part, error) {
 	})
 
 	err := s.Collector.Visit(URL)
+	s.Collector.Wait()
+
 	if err != nil {
 		return nil, err
 	}
