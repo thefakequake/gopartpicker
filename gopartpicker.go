@@ -31,6 +31,7 @@ var (
 type Scraper struct {
 	// The Colly collector used for scraping.
 	Collector *colly.Collector
+	Headers   map[string]map[string]string
 }
 
 type RedirectError struct {
@@ -55,14 +56,28 @@ func NewScraper() Scraper {
 	s := Scraper{
 		Collector: col,
 	}
+	s.Headers = map[string]map[string]string{
+		"global": {},
+	}
 
 	return s
 }
 
-// Sets headers for subsequent requests
-func (s *Scraper) SetHeaders(newHeaders map[string]string) {
+// Sets headers for subsequent requests on a specific site - set site to "pcpartpicker.com" for PCPP or "global" for all sites
+func (s *Scraper) SetHeaders(site string, newHeaders map[string]string) {
+	s.Headers[site] = newHeaders
+
+	for k, v := range newHeaders {
+		s.Headers[site][k] = v
+	}
+
 	s.Collector.OnRequest(func(r *colly.Request) {
-		for k, v := range newHeaders {
+		headers := s.Headers["global"]
+		for k, v := range s.Headers[r.URL.Hostname()] {
+			headers[k] = v
+		}
+
+		for k, v := range headers {
 			if len(k) > 0 && len(v) > 0 {
 				r.Headers.Set(k, v)
 			}
