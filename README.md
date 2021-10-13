@@ -62,7 +62,7 @@ Search for parts via a search term. The second argument is the region to search 
 parts, err := scraper.SearchParts("ryzen 5 3600", "uk")
 
 // Some searches redirect to a product page, if you know that what you are searching will not redirect
-// then you do not need to do the type assertion and if statement.
+// then you do not need to do the type assertion and if statement
 _, ok := err.(*gopartpicker.RedirectError)
 
 if ok {
@@ -84,9 +84,18 @@ if ok {
 Set headers for subsequent requests.
 
 ```go
-scraper.SetHeaders(map[string]string{
+// "global" sets headers for all requests
+scraper.SetHeaders("global", map[string]string{
   "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.71 Safari/537.36",
 })
+
+// Alternatively, make headers site specific by passing in a domain
+scraper.SetHeaders("pcpartpicker.com", map[string]string{
+  "accept": "accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+})
+
+// Make sure you set headers before calling request methods
+scraper.GetPart("...")
 ```
 
 # Documentation
