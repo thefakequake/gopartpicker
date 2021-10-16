@@ -352,21 +352,27 @@ func (s Scraper) GetPart(URL string) (*Part, error) {
 
 	var specs []Spec
 
-	s.Collector.OnHTML(".specs .group", func(spec *colly.HTMLElement) {
-		var values []string
-
-		spec.ForEach(".group__content li", func(i int, specValue *colly.HTMLElement) {
-			values = append(values, specValue.Text)
-		})
-
-		if len(values) == 0 {
-			values = []string{spec.ChildText(".group__content")}
+	s.Collector.OnHTML(".specs", func(specsContainer *colly.HTMLElement) {
+		if len(specs) > 0 {
+			return
 		}
+		specsContainer.ForEach(".group", func(i int, spec *colly.HTMLElement) {
+			var values []string
 
-		specs = append(specs, Spec{
-			Name:   spec.ChildText(".group__title"),
-			Values: values,
+			spec.ForEach(".group__content li", func(i int, specValue *colly.HTMLElement) {
+				values = append(values, specValue.Text)
+			})
+
+			if len(values) == 0 {
+				values = []string{spec.ChildText(".group__content")}
+			}
+
+			specs = append(specs, Spec{
+				Name:   spec.ChildText(".group__title"),
+				Values: values,
+			})
 		})
+
 	})
 
 	err := s.Collector.Visit(URL)
