@@ -8,7 +8,7 @@ import (
 
 // Converts certain PCPartPicker list URLs to a specific format in order to prevent client side JS loading.
 func ConvertListURL(URL string) string {
-	re := regexp2.MustCompile(`(https|http):\/\/([a-z].{2})?(pcpartpicker|partpicker).com\/user\/[a-zA-Z0-9]*\/saved\/#view=([a-zA-Z0-9]){4-8}`, 0)
+	re := regexp2.MustCompile(`(https|http):\/\/([a-z].{2})?pcpartpicker.com\/user\/[a-zA-Z0-9]*\/saved\/#view=([a-zA-Z0-9]){4-8}`, 0)
 	match, _ := re.MatchString(URL)
 
 	if !match {
@@ -20,7 +20,7 @@ func ConvertListURL(URL string) string {
 
 // Checks if a URL is a PCPartPicker URL, making sure to check all regional subdomains
 func MatchPCPPURL(URL string) bool {
-	re := regexp2.MustCompile(`(https|http):\/\/([a-z].{2})?(pcpartpicker|partpicker).com\/?`, 0)
+	re := regexp2.MustCompile(`(https|http):\/\/([a-z].{2})?pcpartpicker.com\/?`, 0)
 
 	match, _ := re.MatchString(URL)
 
@@ -29,7 +29,7 @@ func MatchPCPPURL(URL string) bool {
 
 // Checks if a URL is PCPartPicker product URL
 func MatchProductURL(URL string) bool {
-	re := regexp2.MustCompile(`(https|http):\/\/([a-z].{2})?(pcpartpicker|partpicker).com\/product\/[a-zA-Z0-9]{4,8}\/[\S]*`, 0)
+	re := regexp2.MustCompile(`(https|http):\/\/([a-z].{2})?pcpartpicker.com\/product\/[a-zA-Z0-9]{4,8}\/[\S]*`, 0)
 
 	match, _ := re.MatchString(URL)
 
