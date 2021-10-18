@@ -16,7 +16,7 @@ type Price struct {
 	Tax float64
 	// The price of discounts for the item.
 	Discounts float64
-	// The total price of the item
+	// The total price of the item.
 	Total float64
 	// The currency of the price of the item, e.g. £, $.
 	Currency string
