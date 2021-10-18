@@ -42,7 +42,7 @@ func (r RedirectError) Error() string {
 	return r.URL
 }
 
-// Extracts the name of a vendor from a PCPartPicker affiliate link
+// Extracts the name of a vendor from a PCPartPicker affiliate link.
 func ExtractVendorName(URL string) string {
 	return strings.Split(URL, "/")[2]
 }
@@ -63,7 +63,7 @@ func NewScraper() Scraper {
 	return s
 }
 
-// Sets headers for subsequent requests on a specific site - set site to "pcpartpicker.com" for PCPP or "global" for all sites
+// Sets headers for subsequent requests on a specific site - set site to "pcpartpicker.com" for PCPP or "global" for all sites.
 func (s *Scraper) SetHeaders(site string, newHeaders map[string]string) {
 	s.Headers[site] = newHeaders
 
@@ -194,7 +194,7 @@ func (s Scraper) GetPartList(URL string) (*PartList, error) {
 	return &partList, nil
 }
 
-// Searches for parts using PCPartPicker's search function
+// Searches for parts using PCPartPicker's search function.
 func (s Scraper) SearchParts(searchTerm string, region string) ([]SearchPart, error) {
 	if region != "" {
 		region += "."
@@ -263,6 +263,7 @@ func (s Scraper) SearchParts(searchTerm string, region string) ([]SearchPart, er
 	return searchResults, nil
 }
 
+// Fetches a PCPartPicker product via a URL.
 func (s Scraper) GetPart(URL string) (*Part, error) {
 	if !MatchProductURL(URL) {
 		return nil, errors.New("invalid part URL")
