@@ -6,10 +6,16 @@ import (
 	"github.com/dlclark/regexp2"
 )
 
+var (
+	listURLConversionRequired = regexp2.MustCompile(`(https|http):\/\/([a-z].{2})?pcpartpicker.com\/user\/[a-zA-Z0-9]*\/saved\/#view=([a-zA-Z0-9]){4-8}`, 0)
+	pcppURLCheck = regexp2.MustCompile(`(https|http):\/\/([a-z].{2})?pcpartpicker.com\/?`, 0)
+	productURLCheck = regexp2.MustCompile(`(https|http):\/\/([a-z].{2})?pcpartpicker.com\/product\/[a-zA-Z0-9]{4,8}\/[\S]*`, 0)
+	partListURLCheck = regexp2.MustCompile(`(http|https):\/\/([a-z]{2}\.)?pcpartpicker.com\/((list\/[a-zA-Z0-9]{4,8})|((user\/\w*\/saved\/(#view=)?[a-zA-Z0-9]{4,8})))`, 0)
+)
+
 // Converts certain PCPartPicker list URLs to a specific format in order to prevent client side JS loading.
 func ConvertListURL(URL string) string {
-	re := regexp2.MustCompile(`(https|http):\/\/([a-z].{2})?pcpartpicker.com\/user\/[a-zA-Z0-9]*\/saved\/#view=([a-zA-Z0-9]){4-8}`, 0)
-	match, _ := re.MatchString(URL)
+	match, _ := listURLConversionRequired.MatchString(URL)
 
 	if !match {
 		return URL
@@ -18,22 +24,30 @@ func ConvertListURL(URL string) string {
 	return strings.Replace(URL, "#view=", "", 1)
 }
 
-// Checks if a URL is a PCPartPicker URL, making sure to check all regional subdomains
+// Checks if a URL is a PCPartPicker URL, making sure to check all regional subdomains.
 func MatchPCPPURL(URL string) bool {
-	re := regexp2.MustCompile(`(https|http):\/\/([a-z].{2})?pcpartpicker.com\/?`, 0)
-
-	match, _ := re.MatchString(URL)
+	match, _ := pcppURLCheck.MatchString(URL)
 
 	return match
 }
 
-// Checks if a URL is PCPartPicker product URL
+// Checks if a URL is PCPartPicker product URL.
 func MatchProductURL(URL string) bool {
-	re := regexp2.MustCompile(`(https|http):\/\/([a-z].{2})?pcpartpicker.com\/product\/[a-zA-Z0-9]{4,8}\/[\S]*`, 0)
-
-	match, _ := re.MatchString(URL)
+	match, _ := productURLCheck.MatchString(URL)
 
 	return match
+}
+
+// Check if a URL is a PCPartPicker part list URL.
+func MatchPartListURL(URL string) bool {
+	match, _ := partListURLCheck.MatchString(URL)
+
+	return match
+}
+
+// Returns a list of all valid PCPartPicker part list URLs in the provided text.
+func ExtractPartListURLs(text string) []string {
+	return regexp2FindAllString(partListURLCheck, text)
 }
 
 func regexp2FindAllString(re *regexp2.Regexp, s string) []string {
