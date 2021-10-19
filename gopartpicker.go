@@ -109,7 +109,8 @@ func (s Scraper) GetPartList(URL string) (*PartList, error) {
 				if strings.HasSuffix(toParse, "No Prices Available") || toParse == "FREE" {
 					continue
 				}
-				price, curr, _ := StringPriceToFloat(strings.Replace(toParse, k, "", 1))
+				stringPrice := strings.Replace(toParse, k, "", 1)
+				price, curr, _ := StringPriceToFloat(stringPrice)
 
 				switch k {
 				case "Base":
@@ -121,6 +122,7 @@ func (s Scraper) GetPartList(URL string) (*PartList, error) {
 				case "Tax":
 					partVendor.Price.Shipping = price
 				case "Price":
+					partVendor.Price.TotalString = strings.TrimSpace(stringPrice)
 					partVendor.Price.Total = price
 					partVendor.Price.Currency = curr
 					partVendor.InStock = true
