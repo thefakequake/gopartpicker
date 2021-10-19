@@ -26,6 +26,8 @@ var (
 		"Tax":      ".td__tax",
 		"Total":    ".td__finalPrice",
 	}
+
+	scriptImageCheck = regexp2.MustCompile(`(?<=src:\s").*(?=")`, 0)
 )
 
 type Scraper struct {
@@ -42,8 +44,21 @@ func (r RedirectError) Error() string {
 	return r.URL
 }
 
+func linkURL(parts ...string) string {
+	last := parts[len(parts)-1]
+	if last == "" {
+		return ""
+	} else if strings.HasPrefix(last, "http") {
+		return last
+	}
+	return strings.Join(parts, "")
+}
+
 // Extracts the name of a vendor from a PCPartPicker affiliate link.
 func ExtractVendorName(URL string) string {
+	if URL == "" {
+		return ""
+	}
 	return strings.Split(URL, "/")[2]
 }
 
@@ -130,16 +145,16 @@ func (s Scraper) GetPartList(URL string) (*PartList, error) {
 			}
 
 			if partVendor.InStock {
-				partVendor.URL = "https://" + el.Request.URL.Host + prod.ChildAttr(".td__where a", "href")
-				partVendor.Image = "https:" + prod.ChildAttr(".td__where a img", "src")
+				partVendor.URL = linkURL("https://", el.Request.URL.Host, prod.ChildAttr(".td__where a", "href"))
+				partVendor.Image = linkURL("https:", prod.ChildAttr(".td__where a img", "src"))
 				partVendor.Name = ExtractVendorName(partVendor.URL)
 			}
 
 			part := PartListPart{
 				Type:   prod.ChildText(".td__component"),
 				Name:   prod.ChildText(".td__name"),
-				Image:  prod.ChildAttr(".td__image a", "href"),
-				URL:    "https://" + el.Request.URL.Host + prod.ChildAttr(".td__name a", "href"),
+				Image:  linkURL("https:", prod.ChildAttr(".td__image a img", "src")),
+				URL:    linkURL("https://", el.Request.URL.Host, prod.ChildAttr(".td__name a", "href")),
 				Vendor: partVendor,
 			}
 
@@ -230,7 +245,7 @@ func (s Scraper) SearchParts(searchTerm string, region string) ([]SearchPart, er
 			}
 
 			partVendor := Vendor{
-				URL:  "https://" + el.Request.URL.Host + vendorURL,
+				URL:  linkURL("https://", el.Request.URL.Host, vendorURL),
 				Name: vendorName,
 				Price: Price{
 					Total:       price,
@@ -242,8 +257,8 @@ func (s Scraper) SearchParts(searchTerm string, region string) ([]SearchPart, er
 
 			searchResults = append(searchResults, SearchPart{
 				Name:   searchResult.ChildText(".search_results--link a"),
-				Image:  "https:" + searchResult.ChildAttr(".search_results--img a img", "src"),
-				URL:    "https://" + el.Request.URL.Host + searchResult.ChildAttr(".search_results--link a", "href"),
+				Image:  linkURL("https:", searchResult.ChildAttr(".search_results--img a img", "src")),
+				URL:    linkURL("https://", el.Request.URL.Host, searchResult.ChildAttr(".search_results--link a", "href")),
 				Vendor: partVendor,
 			})
 		})
@@ -274,14 +289,13 @@ func (s Scraper) GetPart(URL string) (*Part, error) {
 	var images []string
 
 	s.Collector.OnHTML(".single_image_gallery_box", func(image *colly.HTMLElement) {
-		images = append(images, "https:"+image.ChildAttr("a img", "src"))
+		images = append(images, linkURL("https:", image.ChildAttr("a img", "src")))
 	})
 
 	if len(images) < 1 {
 		s.Collector.OnHTML("script", func(script *colly.HTMLElement) {
-			r := regexp2.MustCompile(`(?<=src:\s").*(?=")`, 0)
 
-			for _, match := range regexp2FindAllString(r, script.Text) {
+			for _, match := range regexp2FindAllString(scriptImageCheck, script.Text) {
 				if strings.HasPrefix(match, "//") {
 					match = "https:" + match
 				}
@@ -346,9 +360,9 @@ func (s Scraper) GetPart(URL string) (*Part, error) {
 
 		vendors = append(vendors, Vendor{
 			Name:    vendor.ChildAttr(".td__logo a img", "alt"),
-			Image:   "https:" + vendor.ChildAttr(".td__logo a img", "src"),
+			Image:   linkURL("https:", vendor.ChildAttr(".td__logo a img", "src")),
 			InStock: vendor.ChildText(".td__availability") == "In stock",
-			URL:     "https://" + vendor.Request.URL.Host + vendor.ChildAttr(".td__finalPrice a", "href"),
+			URL:     linkURL("https://", vendor.Request.URL.Host, vendor.ChildAttr(".td__finalPrice a", "href")),
 			Price:   price,
 		})
 	})
