@@ -54,14 +54,6 @@ func linkURL(parts ...string) string {
 	return strings.Join(parts, "")
 }
 
-// Extracts the name of a vendor from a PCPartPicker affiliate link.
-func ExtractVendorName(URL string) string {
-	if URL == "" {
-		return ""
-	}
-	return strings.Split(URL, "/")[2]
-}
-
 // Creates a new Scraper instance.
 func NewScraper() Scraper {
 	col := colly.NewCollector()

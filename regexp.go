@@ -8,10 +8,23 @@ import (
 
 var (
 	listURLConversionRequired = regexp2.MustCompile(`(https|http):\/\/([a-z].{2})?pcpartpicker.com\/user\/[a-zA-Z0-9]*\/saved\/#view=([a-zA-Z0-9]){4-8}`, 0)
-	pcppURLCheck = regexp2.MustCompile(`(https|http):\/\/([a-z].{2})?pcpartpicker.com\/?`, 0)
-	productURLCheck = regexp2.MustCompile(`(https|http):\/\/([a-z].{2})?pcpartpicker.com\/product\/[a-zA-Z0-9]{4,8}\/[\S]*`, 0)
-	partListURLCheck = regexp2.MustCompile(`(http|https):\/\/([a-z]{2}\.)?pcpartpicker.com\/((list\/[a-zA-Z0-9]{4,8})|((user\/\w*\/saved\/(#view=)?[a-zA-Z0-9]{4,8})))`, 0)
+	pcppURLCheck              = regexp2.MustCompile(`(https|http):\/\/([a-z].{2})?pcpartpicker.com\/?`, 0)
+	productURLCheck           = regexp2.MustCompile(`(https|http):\/\/([a-z].{2})?pcpartpicker.com\/product\/[a-zA-Z0-9]{4,8}\/[\S]*`, 0)
+	partListURLCheck          = regexp2.MustCompile(`(http|https):\/\/([a-z]{2}\.)?pcpartpicker.com\/((list\/[a-zA-Z0-9]{4,8})|((user\/\w*\/saved\/(#view=)?[a-zA-Z0-9]{4,8})))`, 0)
+	vendorNameCheck           = regexp2.MustCompile(`(?<=pcpartpicker.com\/mr\/).*(?=\/)`, 0)
 )
+
+// Extracts the name of a vendor from a PCPartPicker affiliate link.
+func ExtractVendorName(URL string) string {
+	if URL == "" {
+		return ""
+	}
+	m, err := vendorNameCheck.FindStringMatch(URL)
+	if err != nil {
+		return ""
+	}
+	return m.String()
+}
 
 // Converts certain PCPartPicker list URLs to a specific format in order to prevent client side JS loading.
 func ConvertListURL(URL string) string {
