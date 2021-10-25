@@ -225,19 +225,19 @@ func (s Scraper) SearchParts(searchTerm string, region string) ([]SearchPart, er
 
 	s.Collector.OnHTML(".search-results__pageContent .block", func(el *colly.HTMLElement) {
 		el.ForEach(".list-unstyled li", func(i int, searchResult *colly.HTMLElement) {
-			vendorURL := searchResult.ChildAttr(".search_results--price a", "href")
+			vendorURL := linkURL("https://", el.Request.URL.Host, searchResult.ChildAttr(".search_results--price a", "href"))
 			stringPrice := searchResult.ChildText(".search_results--price a")
 
 			price, curr, _ := StringPriceToFloat(stringPrice)
 
-			var vendorName string
+			vendorName := ""
 
-			if len(stringPrice) > 0 {
+			if stringPrice != "" {
 				vendorName = ExtractVendorName(vendorURL)
 			}
 
 			partVendor := Vendor{
-				URL:  linkURL("https://", el.Request.URL.Host, vendorURL),
+				URL:  vendorURL,
 				Name: vendorName,
 				Price: Price{
 					Total:       price,
