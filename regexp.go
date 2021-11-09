@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	listURLConversionRequired = regexp2.MustCompile(`(https|http):\/\/([a-z].{2})?pcpartpicker.com\/user\/[a-zA-Z0-9]*\/saved\/#view=([a-zA-Z0-9]){4-8}`, 0)
+	listURLConversionRequired = regexp2.MustCompile(`(https|http):\/\/([a-z].{2})?pcpartpicker.com\/user\/[a-zA-Z0-9]*\/saved\/#view=([a-zA-Z0-9]){4,8}`, 0)
 	pcppURLCheck              = regexp2.MustCompile(`(https|http):\/\/([a-z].{2})?pcpartpicker.com\/?`, 0)
 	productURLCheck           = regexp2.MustCompile(`(https|http):\/\/([a-z].{2})?pcpartpicker.com\/product\/[a-zA-Z0-9]{4,8}\/[\S]*`, 0)
 	partListURLCheck          = regexp2.MustCompile(`(http|https):\/\/([a-z]{2}\.)?pcpartpicker.com\/((list\/[a-zA-Z0-9]{4,8})|((user\/\w*\/saved\/(#view=)?[a-zA-Z0-9]{4,8})))`, 0)
