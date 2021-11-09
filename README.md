@@ -4,6 +4,9 @@ A scraper for [pcpartpicker.com](https://pcpartpicker.com) for Go.
 
 It is implemented using [Colly](https://github.com/gocolly/colly).
 
+[![GoDoc](https://godoc.org/github.com/quakecodes/gopartpicker?status.svg)](https://pkg.go.dev/github.com/quakecodes/gopartpicker)
+[![Report Card](https://img.shields.io/badge/report%20card-A-00b800?style=flat-square)](http://goreportcard.com/report/quakecodes/gopartpicker)
+
 ## Features
 
 - Extract data from part list URLs
